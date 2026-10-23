@@ -22,6 +22,10 @@
     <GenerateAppInstallerFile>false</GenerateAppInstallerFile>
     <GenerateAppxPackageOnBuild Condition="'$(BuildSideloadPackage)' == 'true'">true</GenerateAppxPackageOnBuild>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize><DebugSymbols>false</DebugSymbols><DebugType>none</DebugType>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="../Shared/SetupChecks.cs" />
     <PackageReference Include="QRCoder" Version="1.6.0" />

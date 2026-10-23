@@ -11,8 +11,12 @@ public enum BLEWire {
         guard session.count == 8, (1...4).contains(kind), payload.count <= maximum, mtu >= 20 else { throw Failure.malformed }
         let size = mtu - 13
         return stride(from: 0, to: max(1, payload.count), by: size).map { offset in
-            Data([kind]) + session + Data([UInt8(offset >> 8), UInt8(offset & 255),
-                UInt8(payload.count >> 8), UInt8(payload.count & 255)]) + payload.dropFirst(offset).prefix(size)
+            var packet = Data([kind])
+            packet.append(session)
+            packet.append(contentsOf: [UInt8(offset >> 8), UInt8(offset & 255),
+                UInt8(payload.count >> 8), UInt8(payload.count & 255)])
+            packet.append(payload.dropFirst(offset).prefix(size))
+            return packet
         }
     }
     public struct Message { public let kind: UInt8; public let session: Data; public let payload: Data }

@@ -18,6 +18,10 @@
     <DebugType>full</DebugType>
     <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize><DebugSymbols>false</DebugSymbols><DebugType>none</DebugType>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Shared\SignInLabel.cs"><Link>Shared\SignInLabel.cs</Link></Compile>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.14" />

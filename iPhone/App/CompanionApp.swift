@@ -472,18 +472,6 @@ final class NotificationObserver: NSObject, UNUserNotificationCenterDelegate {
                         }
                     }
                     Section {
-                      DisclosureGroup("Approval settings") {
-                        Toggle("Use Face ID", isOn: Binding(get: { model.useFaceID },
-                            set: { model.setApprovalOptions(faceID: $0, automatic: model.autoApprove) }))
-                        Toggle("Automatically approve unlocks", isOn: Binding(get: { model.autoApprove },
-                            set: { model.setApprovalOptions(faceID: model.useFaceID, automatic: $0) }))
-                      }
-                    } header: {
-                        Text("Unlock approval")
-                    } footer: {
-                        Text(model.autoApprove && !model.useFaceID ? "Your paired PC can unlock without asking, even while this phone is locked." : model.autoApprove ? "Open the notification to authenticate and approve." : "Review each request before approving. Pairing always requires authentication.")
-                    }
-                    Section {
                         Label(model.bluetoothStatus, systemImage: "antenna.radiowaves.left.and.right")
                             .accessibilityLabel("Bluetooth: " + model.bluetoothStatus)
                     } header: {
@@ -516,6 +504,21 @@ final class NotificationObserver: NSObject, UNUserNotificationCenterDelegate {
                         Text(model.status)
                             .accessibilityLabel("Request status: " + model.status)
                     }
+                    Section {
+                        NavigationLink("Settings") {
+                            Form {
+                    Section {
+                      DisclosureGroup("Approval settings") {
+                        Toggle("Use Face ID", isOn: Binding(get: { model.useFaceID },
+                            set: { model.setApprovalOptions(faceID: $0, automatic: model.autoApprove) }))
+                        Toggle("Automatically approve unlocks", isOn: Binding(get: { model.autoApprove },
+                            set: { model.setApprovalOptions(faceID: model.useFaceID, automatic: $0) }))
+                      }
+                    } header: {
+                        Text("Unlock approval")
+                    } footer: {
+                        Text(model.autoApprove && !model.useFaceID ? "Your paired PC can unlock without asking, even while this phone is locked." : model.autoApprove ? "Open the notification to authenticate and approve." : "Review each request before approving. Pairing always requires authentication.")
+                    }
                     Section("Notifications") {
                         Text(model.notificationStatus)
                         Text("Using Focus or Do Not Disturb? Allow PocketLatch in that Focus’s app list.")
@@ -535,6 +538,9 @@ final class NotificationObserver: NSObject, UNUserNotificationCenterDelegate {
                                 }
                             }
 
+                        }
+                    }
+                            }.navigationTitle("Settings")
                         }
                     }
                 }.navigationTitle("PocketLatch")

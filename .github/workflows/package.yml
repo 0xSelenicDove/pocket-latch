@@ -1,7 +1,8 @@
-name: Build Windows probe package
+name: Build Windows release
 on:
   push:
     branches: [main]
+    paths: ["CdfProbe*/**", "CdfProbe.sln", "Shared/**", "BluetoothHost/**", "SetupProbe/**", "packaging/**", "tests/**", "Directory.Build.props", ".github/workflows/package.yml"]
   workflow_dispatch:
 permissions:
   contents: read

@@ -2,6 +2,7 @@ name: Build unsigned iOS release
 on:
   push:
     branches: [main]
+    paths: ["iPhone/**", ".github/workflows/ios.yml"]
   workflow_dispatch:
 permissions:
   contents: read
