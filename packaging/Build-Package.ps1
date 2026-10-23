@@ -8,6 +8,10 @@ $packagePrefix = 'CdfProbe'
 $subject = 'CN=PocketLatch'
 $project = Join-Path $root 'CdfProbe.sln'
 $instructions = Join-Path $PSScriptRoot 'INSTALL.txt'
+[xml]$manifest = Get-Content (Join-Path $root 'CdfProbe\Package.appxmanifest')
+if ($manifest.Package.Identity.Name -ne 'PocketLatch' -or $manifest.Package.Identity.Publisher -ne 'CN=PocketLatch' -or $manifest.Package.Identity.Version -ne '0.1.0.0') {
+    throw 'Unexpected public release package identity/version.'
+}
     & dotnet publish (Join-Path $root 'BluetoothHost\BluetoothHost.csproj') -c Release -r "win-$($Platform.ToLower())" --self-contained true -o (Join-Path $root 'CdfProbe\BluetoothHost')
     if ($LASTEXITCODE -ne 0) { throw 'Bluetooth host build failed.' }
     $hostRoot = Join-Path $root 'CdfProbe\BluetoothHost'
