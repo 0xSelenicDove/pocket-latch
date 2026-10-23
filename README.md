@@ -18,15 +18,18 @@ The main screen shows pairing or the current request. Approval preferences and m
 
 ## Windows Hello support
 
-CDF can participate in authentication beyond the lock screen on compatible Windows configurations. Our development testing verified Windows unlock; the project owner also reports successful Enpass and Microsoft Store purchase authentication. These are observed results, not a guarantee for every Windows Hello prompt or Windows build.
+CDF can participate in authentication beyond the lock screen on compatible Windows configurations. We have tested Windows unlock, app unlocking, Microsoft Store purchase authentication, and saving a passkey. Compatibility still depends on the Windows configuration and the application’s Windows Hello integration.
 
-| Scenario | Evidence / scope |
+| Scenario | Test status |
 |---|---|
 | Windows unlock | Verified during development on compatible configurations. |
-| Enpass Windows Hello authentication | Reported working in the project owner's testing. |
-| Microsoft Store purchase authentication | Reported working in the project owner's testing. |
+| App unlocking with Windows Hello | Tested successfully with a Windows Hello-enabled app. |
+| Microsoft Store purchase authentication | Tested successfully. |
+| Saving a passkey through Windows Hello | Tested successfully in a Windows VM running on a Mac. |
 | UAC elevation | Not supported according to the linked GoTrust field report; not claimed by PocketLatch. |
-| Other app prompts and browser/passkey flows | Not established; test each integration separately. CDF is not itself a FIDO2 authenticator. |
+| Other Windows Hello requests | Compatibility varies; additional apps and flows need testing. |
+
+The passkey result covers approving the Windows Hello prompt when saving a passkey. Using that passkey for subsequent sign-ins has not yet been verified.
 
 Microsoft's [CDF guide](https://learn.microsoft.com/en-us/windows/uwp/security/companion-device-unlock) still describes post-unlock authentication as future work. That wording does not capture the broader behavior observed above. A [GoTrust ID field report](https://blog.csdn.net/weixin_46583461/article/details/125708231) independently describes application and Store purchase authentication, excluding UAC; it is corroboration about GoTrust, not a PocketLatch compatibility certification.
 
