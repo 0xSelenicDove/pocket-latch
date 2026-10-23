@@ -117,8 +117,8 @@ public final class CompanionService extends Service implements BleClient.Listene
         Intent deny=new Intent(this,CompanionService.class).setAction("deny:"+pendingId).putExtra("request",pendingId);
         PendingIntent no=PendingIntent.getService(this,0,deny,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         Notification n=new Notification.Builder(this,REQUESTS).setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(registration?"Pair with Windows?":"Unlock your Windows PC?")
-            .setContentText("Review this request within 30 seconds.")
+            .setContentTitle(Protocol.approvalPrompt(pending.optString("operation"),pending.optString("scenario")))
+            .setContentText(registration?"Confirm pairing on your PC.":Protocol.approvalDetail(pending.optString("scenario")))
             .setContentIntent(open(pendingId,false)).setVisibility(Notification.VISIBILITY_PRIVATE)
             .setTimeoutAfter(Math.max(1,deadline-SystemClock.elapsedRealtime()))
             .addAction(new Notification.Action.Builder(null,"Approve",open(pendingId,true)).build())

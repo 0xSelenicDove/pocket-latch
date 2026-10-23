@@ -3,6 +3,14 @@ import XCTest
 @testable import CdfCompanionProtocol
 
 final class CdfProtocolTests: XCTestCase {
+    func testApprovalPromptsHandleAppAndLegacyRequests() {
+        XCTAssertEqual(ApprovalPrompt.title(operation: "prepareUnlock", scenario: "SignIn"), "Approve Windows sign-in?")
+        for scenario: String? in ["CredentialPrompt", nil, "FutureScenario"] {
+            XCTAssertEqual(ApprovalPrompt.title(operation: "prepareUnlock", scenario: scenario), "Approve Windows Hello authentication?")
+        }
+        XCTAssertEqual(ApprovalPrompt.title(operation: "register", scenario: nil), "Pair this phone with Windows?")
+    }
+
     private func sequence(_ start: Int) -> Data { Data((start..<start + 32).map(UInt8.init)) }
     private let serviceHmac = Data([
         0xa3,0x32,0x45,0x47,0x08,0x79,0x7a,0xd0,0x66,0x6f,0xdb,0x1d,0xfe,0xbe,0xd0,0xef,

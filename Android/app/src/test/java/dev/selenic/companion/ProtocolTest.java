@@ -4,6 +4,13 @@ import static org.junit.Assert.*;
 import org.json.JSONObject;
 import java.util.*;
 public class ProtocolTest {
+    @Test public void promptsDoNotMislabelAppRequestsOrLegacyClients() {
+        assertEquals("Approve Windows sign-in?",Protocol.approvalPrompt("prepareUnlock","SignIn"));
+        for(String scenario:new String[]{"CredentialPrompt","", "FutureScenario"})
+            assertEquals("Approve Windows Hello authentication?",Protocol.approvalPrompt("prepareUnlock",scenario));
+        assertEquals("Pair this phone with Windows?",Protocol.approvalPrompt("register",""));
+    }
+
     byte[] seq(int start){byte[] b=new byte[32];for(int i=0;i<32;i++)b[i]=(byte)(start+i);return b;}
     byte[] hex(String h){return java.util.HexFormat.of().parseHex(h);}
     @Test public void windowsChallengeVector() throws Exception {

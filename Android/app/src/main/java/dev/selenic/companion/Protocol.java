@@ -10,6 +10,16 @@ import org.json.JSONObject;
 
 /** Wire-compatible with the Windows and iOS implementations. No Android dependency. */
 final class Protocol {
+    static String approvalPrompt(String operation, String scenario) {
+        if ("register".equals(operation)) return "Pair this phone with Windows?";
+        if ("SignIn".equals(scenario)) return "Approve Windows sign-in?";
+        return "Approve Windows Hello authentication?";
+    }
+    static String approvalDetail(String scenario) {
+        return "SignIn".equals(scenario) ? "Check the sign-in request on your PC."
+            : "Check the requesting app on your PC. Windows does not provide its name to PocketLatch.";
+    }
+
     static final UUID SERVICE = UUID.fromString("8d501100-27f0-4a65-ad64-0e42b41d6401");
     static final UUID DOWN = UUID.fromString("8d501101-27f0-4a65-ad64-0e42b41d6401");
     static final UUID UP = UUID.fromString("8d501102-27f0-4a65-ad64-0e42b41d6401");

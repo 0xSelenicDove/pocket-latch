@@ -151,10 +151,15 @@ namespace CdfProbe.Background
                 if (!ProbeState.PhoneMode) throw new InvalidOperationException("Pair your phone first.");
                 bool phone = true;
                 if (phone && bluetooth == null) bluetooth = await NativeBleTransport.OpenAsync(ProbeState.PhoneHost, cancellation);
+                var context = await SecondaryAuthenticationFactorAuthentication.GetAuthenticationStageInfoAsync();
+                // CDF exposes a scenario, but no requesting app identity or transaction details.
+                var scenario = context.Scenario.ToString();
+                ProbeState.Write("Phone authentication scenario=" + scenario);
                 var serviceNonce = ProbeState.Bytes(CryptographicBuffer.GenerateRandom(32));
                 {
                     var prepare = new JsonObject {
                         ["operation"] = JsonValue.CreateStringValue("prepareUnlock"),
+                        ["scenario"] = JsonValue.CreateStringValue(scenario),
                         ["deviceId"] = JsonValue.CreateStringValue(ticket.DeviceId)
                     };
                     PhoneClient.Put(prepare, "serviceNonce", serviceNonce);
@@ -198,7 +203,7 @@ namespace CdfProbe.Background
                 var status = await authentication.FinishAuthenticationAsync(
                     ProbeState.Buffer(deviceHmac), ProbeState.Buffer(sessionHmac));
                 authentication = null;
-                ProbeState.Write("FinishAuthenticationAsync=" + status + ". Confirm desktop unlock visually.");
+                ProbeState.Write("FinishAuthenticationAsync=" + status + ". Confirm authentication in Windows.");
                 // This task can finish before the final stage event arrives.
                 if (status == SecondaryAuthenticationFactorFinishAuthenticationStatus.Completed)
                     ProbeState.AutomaticAttempt = null;

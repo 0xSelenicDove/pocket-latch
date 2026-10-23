@@ -406,11 +406,13 @@ final class NotificationObserver: NSObject, UNUserNotificationCenterDelegate {
         }
         let requestNotificationId = UUID().uuidString
         notificationId = requestNotificationId
-        pending = operation == "register" ? "Register this phone with Windows?" : "Unlock your paired Windows PC?"
+        let prompt = ApprovalPrompt.title(operation: operation, scenario: request["scenario"])
+        let detail = operation == "register" ? "Confirm pairing on your PC." : ApprovalPrompt.detail(scenario: request["scenario"])
+        pending = prompt + "\n" + detail
         if UIApplication.shared.applicationState != .active {
             let content = UNMutableNotificationContent()
-            content.title = "Windows approval requested"
-            content.body = "Open to approve this Windows sign-in. Expires at \(expires.formatted(date: .omitted, time: .standard)); after that, start a new attempt on Windows."
+            content.title = prompt
+            content.body = "\(detail) Expires at \(expires.formatted(date: .omitted, time: .standard)); after that, start a new attempt on Windows."
             content.interruptionLevel = .active
             content.sound = .default
             content.threadIdentifier = "windows-approval"
@@ -511,13 +513,13 @@ final class NotificationObserver: NSObject, UNUserNotificationCenterDelegate {
                       DisclosureGroup("Approval settings") {
                         Toggle("Use Face ID", isOn: Binding(get: { model.useFaceID },
                             set: { model.setApprovalOptions(faceID: $0, automatic: model.autoApprove) }))
-                        Toggle("Automatically approve unlocks", isOn: Binding(get: { model.autoApprove },
+                        Toggle("Automatically approve requests", isOn: Binding(get: { model.autoApprove },
                             set: { model.setApprovalOptions(faceID: model.useFaceID, automatic: $0) }))
                       }
                     } header: {
-                        Text("Unlock approval")
+                        Text("Authentication approval")
                     } footer: {
-                        Text(model.autoApprove && !model.useFaceID ? "Your paired PC can unlock without asking, even while this phone is locked." : model.autoApprove ? "Open the notification to authenticate and approve." : "Review each request before approving. Pairing always requires authentication.")
+                        Text(model.autoApprove && !model.useFaceID ? "Windows sign-in and compatible app requests can be approved without asking, even while this phone is locked." : model.autoApprove ? "Open the notification to authenticate and approve." : "Review each request before approving. Pairing always requires authentication.")
                     }
                     Section("Notifications") {
                         Text(model.notificationStatus)

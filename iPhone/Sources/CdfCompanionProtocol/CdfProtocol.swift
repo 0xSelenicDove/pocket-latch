@@ -51,3 +51,16 @@ public struct UnlockApproval {
         return saved.device == device && saved.nonce == nonce && now < saved.expires
     }
 }
+
+/// Display only authenticated request context; older Windows clients get generic wording.
+public enum ApprovalPrompt {
+    public static func title(operation: String, scenario: String?) -> String {
+        if operation == "register" { return "Pair this phone with Windows?" }
+        if scenario == "SignIn" { return "Approve Windows sign-in?" }
+        return "Approve Windows Hello authentication?"
+    }
+    public static func detail(scenario: String?) -> String {
+        scenario == "SignIn" ? "Check the sign-in request on your PC."
+            : "Check the requesting app on your PC. Windows does not provide its name to PocketLatch."
+    }
+}

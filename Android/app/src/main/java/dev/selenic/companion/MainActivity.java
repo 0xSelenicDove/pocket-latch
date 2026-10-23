@@ -42,7 +42,7 @@ public final class MainActivity extends FragmentActivity {
         setContentView(scroll);
         ImageView logo=new ImageView(this);logo.setImageResource(R.mipmap.ic_launcher);body.addView(logo,new LinearLayout.LayoutParams(dp(48),dp(48)));
         title("PocketLatch",30);text("Your phone. Your choice.",16);
-        title("Sign-in",20);request=text("No request waiting.",16);
+        title("Authentication request",20);request=text("No request waiting.",16);
         approve=button("Approve",()->approveCurrent(shown));deny=button("Deny",()->{CompanionService s=CompanionService.instance;if(s!=null&&s.current(shown))s.reject("You denied the request.");});
         title("Connection",20);connection=text("Waiting for Bluetooth…",16);
         status=text("Ready to pair.",15);
@@ -52,10 +52,10 @@ public final class MainActivity extends FragmentActivity {
         LinearLayout home=body;
         settings=new LinearLayout(this);settings.setOrientation(LinearLayout.VERTICAL);settings.setVisibility(View.GONE);
         body.addView(settings);body=settings;
-        title("Unlock approval",20);
-        biometric=toggle("Use biometrics or screen lock");automatic=toggle("Automatically approve unlocks");
+        title("Authentication approval",20);
+        biometric=toggle("Use biometrics or screen lock");automatic=toggle("Automatically approve requests");
         biometric.setOnCheckedChangeListener((v,on)->options());automatic.setOnCheckedChangeListener((v,on)->options());
-        text("With both on, open the notification to authenticate. With biometrics off and automatic approval on, your paired PC can unlock while this phone is locked.",14);
+        text("With both on, open the notification to authenticate. With biometrics off and automatic approval on, Windows sign-in and compatible app requests can be approved while this phone is locked.",14);
         button("Manual pairing",()->new AlertDialog.Builder(this).setTitle("Create a pairing code?")
             .setMessage("This replaces this phone’s current pairing. Enter the new code in Windows → Manual setup within two minutes.")
             .setPositiveButton("Create code",(d,w)->createPairing(null)).setNegativeButton("Cancel",null).show());
@@ -138,7 +138,7 @@ public final class MainActivity extends FragmentActivity {
         String previous=shown;
         shown=waiting?s.pendingId:"";
         if(waiting && !shown.equals(previous))scroll.post(()->scroll.smoothScrollTo(0,0));
-        request.setText(waiting?(s.pending.optString("operation").equals("register")?"Pair this phone with Windows?":"Unlock your paired PC?"):"No request waiting.");
+        request.setText(waiting?(Protocol.approvalPrompt(s.pending.optString("operation"),s.pending.optString("scenario")) + "\n" + (s.pending.optString("operation").equals("register")?"Confirm pairing on your PC.":Protocol.approvalDetail(s.pending.optString("scenario")))):"No request waiting.");
         approve.setVisibility(waiting?View.VISIBLE:View.GONE);deny.setVisibility(waiting?View.VISIBLE:View.GONE);
         biometric.setEnabled(!waiting);automatic.setEnabled(!waiting);
         if(s!=null){connection.setText(s.connectionStatus);status.setText(s.status);}
