@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>NSCameraUsageDescription</key><string>Scan the pairing code displayed on your Windows PC.</string>
+<key>UIBackgroundModes</key><array><string>bluetooth-central</string></array>
+<key>NSBluetoothAlwaysUsageDescription</key><string>Receive encrypted Windows approval requests over Bluetooth, including while this app is in the background.</string>
+</dict></plist>

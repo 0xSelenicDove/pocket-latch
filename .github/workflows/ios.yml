@@ -1,0 +1,26 @@
+name: Build unsigned iOS release
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ipa:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Protocol checks
+        run: swift test --package-path iPhone
+      - name: Build unsigned device app
+        run: xcodebuild -project iPhone/CdfCompanion.xcodeproj -scheme CdfCompanion -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
+      - name: Package unsigned IPA
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/PocketLatch.app Payload/
+          test ! -f Payload/PocketLatch.app/embedded.mobileprovision
+          zip -qry PocketLatch-iOS-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PocketLatch-iOS-unsigned
+          path: PocketLatch-iOS-unsigned.ipa

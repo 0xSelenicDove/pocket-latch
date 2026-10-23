@@ -1,0 +1,82 @@
+<Page x:Class="CdfProbe.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+  <Page.Resources>
+    <Style x:Key="AccentButtonStyle" TargetType="Button">
+      <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundAccentBrush}" />
+      <Setter Property="Foreground" Value="{ThemeResource SystemControlBackgroundChromeWhiteBrush}" />
+    </Style>
+  </Page.Resources>
+  <Grid Padding="24,16,24,24" MaxWidth="1060" HorizontalAlignment="Stretch">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+    <StackPanel Orientation="Horizontal" Spacing="12" Margin="12,8,0,20">
+      <FontIcon Glyph="&#xE72E;" FontSize="28" VerticalAlignment="Center" Foreground="{ThemeResource SystemControlForegroundAccentBrush}" />
+      <StackPanel>
+        <TextBlock Text="PocketLatch" FontSize="26" FontWeight="SemiBold" />
+        <TextBlock Text="A simpler way to sign in." Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+      </StackPanel>
+    </StackPanel>
+    <TextBlock Grid.Row="1" x:Name="ActionError" Margin="12,0,12,16" TextWrapping="Wrap" Visibility="Collapsed" AutomationProperties.LiveSetting="Assertive" />
+    <Pivot Grid.Row="2">
+      <PivotItem Header="Home">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="24" Padding="0,8,12,24">
+            <Border CornerRadius="20" Padding="32" BorderThickness="1" BorderBrush="#304A8FC7">
+              <Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#142C43" Offset="0"/><GradientStop Color="#214E69" Offset="1"/></LinearGradientBrush></Border.Background>
+              <StackPanel Spacing="16">
+                <TextBlock Text="PHONE UNLOCK" FontSize="12" CharacterSpacing="160" Foreground="#93D9E8" />
+                <TextBlock x:Name="UnlockHeading" Foreground="White" Text="Welcome" FontSize="34" FontWeight="SemiBold" TextWrapping="Wrap" />
+                <TextBlock x:Name="Status" Foreground="#E0EBF2" TextWrapping="Wrap" FontSize="17" AutomationProperties.LiveSetting="Polite" />
+                <StackPanel x:Name="PairControls" Visibility="Collapsed" Spacing="12">
+                  <Button Content="Check PC &amp; pair your phone" Click="QrPair_Click" Style="{StaticResource AccentButtonStyle}" Padding="20,12" />
+                  <TextBlock Foreground="#E0EBF2" Text="Scan the QR code with PocketLatch on your phone. Keep both devices nearby." TextWrapping="Wrap" />
+                </StackPanel>
+                <Button x:Name="SetupBackgroundButton" Content="Allow background access" Click="Enable_Click" Visibility="Collapsed" Style="{StaticResource AccentButtonStyle}" Padding="20,12" />
+                <Button x:Name="AutomaticUnlockButton" Content="Enable phone unlock" Click="AutomaticUnlock_Click" Visibility="Collapsed" Style="{StaticResource AccentButtonStyle}" Padding="20,12" />
+              </StackPanel>
+            </Border>
+            <TextBlock Text="Lock Windows, then approve on your phone. Your Windows PIN is always available." TextWrapping="Wrap" Margin="8,0" />
+          </StackPanel>
+        </ScrollViewer>
+      </PivotItem>
+      <PivotItem Header="Settings">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="24" Padding="8,8,12,24">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Your phone" FontSize="20" FontWeight="SemiBold" />
+              <TextBlock x:Name="PairingStatus" Text="Checking pairing…" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+              <Button x:Name="UnpairButton" Content="Unpair phone…" Click="Remove_Click" Visibility="Collapsed" />
+            </StackPanel>
+            <StackPanel Spacing="12">
+              <TextBlock Text="Phone notifications" FontSize="20" FontWeight="SemiBold" />
+              <TextBlock Text="Allow PocketLatch notifications on your phone’s lock screen. If you use Focus or Do Not Disturb, add the app to its allowed list." TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Spacing="12">
+              <TextBlock Text="Connection" FontSize="20" FontWeight="SemiBold" />
+              <TextBlock x:Name="ConnectionStatus" Text="Choose direct Bluetooth when pairing to connect without a bridge. Your PC must support Bluetooth LE peripheral mode." TextWrapping="Wrap" />
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </PivotItem>
+      <PivotItem Header="Support">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="16" Padding="8,8,12,24">
+            <TextBlock Text="Help with sign-in" FontSize="20" FontWeight="SemiBold" />
+            <TextBlock Text="No notification? Check Bluetooth and your phone’s notification settings. You can always sign in with your Windows PIN." TextWrapping="Wrap" />
+            <Button Content="Check compatibility" Click="Check_Click" />
+            <Button Content="Save diagnostic report…" Click="Save_Click" />
+            <ToggleButton x:Name="DiagnosticsToggle" Content="Show diagnostics" Checked="DiagnosticsToggle_Changed" Unchecked="DiagnosticsToggle_Changed" />
+            <StackPanel x:Name="DiagnosticsPanel" Visibility="Collapsed" Spacing="12">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button Content="Refresh log" Click="Refresh_Click" />
+                <Button Content="Clear log" Click="ClearLog_Click" />
+              </StackPanel>
+              <TextBox x:Name="Log" Height="240" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Consolas" AutomationProperties.Name="Diagnostic log" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </PivotItem>
+    </Pivot>
+  </Grid>
+</Page>

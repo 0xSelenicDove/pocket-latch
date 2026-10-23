@@ -1,0 +1,40 @@
+name: Build Windows probe package
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [x64, ARM64]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Protocol checks
+        shell: pwsh
+        run: dotnet run --project tests/ProtocolChecks.csproj
+      - name: Native Windows phone wire checks
+        shell: pwsh
+        run: dotnet run --project tests/PhoneWireChecks.csproj
+      - name: Build signed sideload package
+        shell: powershell
+        run: .\packaging\Build-Package.ps1 -Platform ${{ matrix.architecture }}
+      - name: Upload install ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: CdfProbe-${{ matrix.architecture }}-install
+          path: artifacts/CdfProbe-${{ matrix.architecture }}-install.zip
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload build diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-diagnostics-${{ matrix.architecture }}
+          path: artifacts/**/*.binlog
+          retention-days: 7

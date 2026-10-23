@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+    <ProjectGuid>{702B453A-CF6D-4D90-A9AE-15A019458B49}</ProjectGuid>
+    <OutputType>AppContainerExe</OutputType>
+    <RootNamespace>CdfProbe</RootNamespace>
+    <AssemblyName>CdfProbe</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <PlatformTarget>$(Platform)</PlatformTarget>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+    <AppxBundle>Never</AppxBundle>
+    <GenerateAppInstallerFile>false</GenerateAppInstallerFile>
+    <GenerateAppxPackageOnBuild Condition="'$(BuildSideloadPackage)' == 'true'">true</GenerateAppxPackageOnBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../Shared/SetupChecks.cs" />
+    <PackageReference Include="QRCoder" Version="1.6.0" />
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.14" />
+    <Compile Include="App.xaml.cs"><DependentUpon>App.xaml</DependentUpon></Compile>
+    <Compile Include="MainPage.xaml.cs"><DependentUpon>MainPage.xaml</DependentUpon></Compile>
+    <Compile Include="..\Shared\BluetoothRelay.cs" />
+    <Compile Include="..\Shared\BleWire.cs"><Link>Shared\BleWire.cs</Link></Compile>
+    <Compile Include="..\Shared\NativeBleTransport.cs"><Link>Shared\NativeBleTransport.cs</Link></Compile>
+    <Compile Include="..\Shared\PhoneClient.cs"><Link>Shared\PhoneClient.cs</Link></Compile>
+    <Compile Include="..\Shared\Protocol.cs"><Link>Shared\Protocol.cs</Link></Compile>
+    <Compile Include="..\Shared\ProbeState.cs"><Link>Shared\ProbeState.cs</Link></Compile>
+    <ApplicationDefinition Include="App.xaml"><Generator>MSBuild:Compile</Generator></ApplicationDefinition>
+    <Page Include="MainPage.xaml"><Generator>MSBuild:Compile</Generator></Page>
+    <AppxManifest Include="Package.appxmanifest"><SubType>Designer</SubType></AppxManifest>
+    <Content Include="SetupProbe.exe" />
+    <Content Include="Assets\*.png" />
+    <Content Include="Properties\Default.rd.xml" />
+    <ProjectReference Include="..\CdfProbe.Background\CdfProbe.Background.csproj">
+      <Project>{79FC0789-23BE-47C0-97F0-67CDBB71FD48}</Project>
+      <Name>CdfProbe.Background</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="WindowsDesktop, Version=10.0.19041.0" />
+  </ItemGroup>
+  <Target Name="IncludeSetupProbePayload" AfterTargets="BuildNativePackage">
+    <ItemGroup>
+      <AppxPackagePayload Remove="$(MSBuildProjectDirectory)\SetupProbe.exe" />
+      <AppxPackagePayload Include="$(MSBuildProjectDirectory)\SetupProbe.exe">
+        <TargetPath>SetupProbe.exe</TargetPath>
+      </AppxPackagePayload>
+    </ItemGroup>
+  </Target>
+  <Import Project="BluetoothHost.Payload.targets" Condition="Exists('BluetoothHost.Payload.targets')" />
+  <Target Name="BuildSetupProbe" BeforeTargets="PrepareForBuild">
+    <Exec Command="&quot;$(MSBuildToolsPath)\Roslyn\csc.exe&quot; /nologo /target:winexe /platform:anycpu /reference:System.Management.dll /reference:System.Web.Extensions.dll /out:&quot;$(MSBuildProjectDirectory)\SetupProbe.exe&quot; &quot;$(MSBuildProjectDirectory)\..\SetupProbe\Program.cs&quot;" />
+    <Exec Command="&quot;$(MSBuildProjectDirectory)\SetupProbe.exe&quot; --check" />
+  </Target>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+</Project>

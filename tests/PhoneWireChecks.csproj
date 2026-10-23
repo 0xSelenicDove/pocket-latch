@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../Shared/SetupChecks.cs" />
+    <Compile Include="../Shared/BluetoothRelay.cs" />
+    <Compile Include="../Shared/SignInLabel.cs" Link="SignInLabel.cs" />
+    <Compile Include="../Shared/PhoneClient.cs" Link="PhoneClient.cs" />
+    <Compile Include="../Shared/BleWire.cs" Link="BleWire.cs" />
+    <Compile Include="../Shared/NativeBleTransport.cs" Link="NativeBleTransport.cs" />
+    <Compile Include="PhoneWireChecks.cs" />
+  </ItemGroup>
+</Project>
