@@ -1,78 +1,104 @@
 # PocketLatch
 
-Unlock Windows and approve compatible Windows Hello requests from your phone over Bluetooth—without storing your Windows password. No account or cloud service.
+Unlock Windows with your phone.
 
-**First public preview — compatibility is limited.** PocketLatch uses the legacy Windows Hello Companion Device Framework. Microsoft [deprecated this API in Windows 10 version 2004](https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/windows-hello-companion-device-framework). A Windows version number alone does not guarantee that it works. Run the app's PC checks before pairing. VBS-protected Windows Hello was incompatible in development testing; PocketLatch does not change those protections or machine policy.
+PocketLatch lets you approve Windows sign-in and Windows Hello prompts from your Android phone or iPhone, over Bluetooth. Tap approve, confirm with Face ID, fingerprint, or your phone's screen lock — and you're in.
 
-[Download releases](https://github.com/0xSelenicDove/pocket-latch/releases) · [Install and pair](INSTALL.md) · [Security and privacy](SECURITY.md)
+It never stores your Windows password, and there's no account to create and no cloud service in the middle. Everything stays between your phone and your PC. Your Windows PIN still works as a backup, just like before.
 
-## What it does
+[Download the latest release](https://github.com/0xSelenicDove/pocket-latch/releases) · [Install and pair](INSTALL.md) · [Security and privacy](SECURITY.md)
 
-- Pair by scanning a short-lived QR code, or use a manual code.
-- Approve or deny a sign-in from a phone notification.
-- Require biometrics/device authentication, or opt into automatic approval.
-- Keep Windows Bluetooth available through a small background companion, even with the window closed.
-- Keep your Windows PIN as the fallback.
+> **This is a first public preview, so please read this part:** PocketLatch is built on Microsoft's older Windows Hello Companion Device Framework (CDF). Microsoft [deprecated that framework in Windows 10 version 2004](https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/windows-hello-companion-device-framework), which means it works on some PCs and not others — and a Windows version number alone won't tell you which. Run the PC checks in the app before you pair. If your PC uses VBS-protected Windows Hello, it won't work — that combination was incompatible in our testing. PocketLatch won't try to change those protections or your PC's policies to force it.
 
-The main screen shows pairing or the current request. Approval preferences and manual setup live in settings. There is no simulator, test-arming button, Wi-Fi listener, or Mac bridge in this distribution. Automated tests remain in the source tree.
+## How it works
 
-## Windows Hello support
+1. **Install PocketLatch on your PC and your phone.**
+2. **Pair them once** by scanning the QR code shown on your PC (there's a manual code too, if you prefer).
+3. **Next time Windows asks, your phone buzzes.** Approve or deny it from the notification.
 
-CDF can participate in authentication beyond the lock screen on compatible Windows configurations. We have tested Windows unlock, app unlocking, Microsoft Store purchase authentication, and saving a passkey. Compatibility still depends on the Windows configuration and the application’s Windows Hello integration.
+That's the everyday experience. A small companion app keeps Bluetooth available on Windows in the background, so you can close the PocketLatch window and forget about it.
 
-| Scenario | Test status |
+By default, every request needs your approval and your phone's authentication. You can change that in settings — more on that below, because the trade-off matters.
+
+## More than just unlocking
+
+On PCs where CDF works, Windows Hello isn't only for the lock screen. In our testing, PocketLatch also handled:
+
+| What we tried | How it went |
 |---|---|
-| Windows unlock | Verified during development on compatible configurations. |
-| App unlocking with Windows Hello | Tested successfully with a Windows Hello-enabled app. |
-| Microsoft Store purchase authentication | Tested successfully. |
-| Saving a passkey through Windows Hello | Tested successfully in a Windows VM running on a Mac. |
-| UAC elevation | Not supported according to the linked GoTrust field report; not claimed by PocketLatch. |
-| Other Windows Hello requests | Compatibility varies; additional apps and flows need testing. |
+| Unlocking Windows | Works on compatible PCs |
+| Unlocking an app that uses Windows Hello | Worked |
+| Approving a Microsoft Store purchase | Worked |
+| Saving a passkey with Windows Hello | Worked — tested in a Windows VM on a Mac |
+| UAC elevation prompts | Not supported |
+| Other Windows Hello prompts | It depends on the app and your Windows setup — more testing needed |
 
-The passkey result covers approving the Windows Hello prompt when saving a passkey. Using that passkey for subsequent sign-ins has not yet been verified.
+Two honest caveats: saving a passkey worked, but signing back in later with that same passkey hasn't been verified yet. And when a prompt comes in, PocketLatch can usually tell a Windows sign-in apart from a general Hello request, but Windows doesn't tell it which app is asking or what you're buying. So glance at your PC screen before you approve — PocketLatch won't guess for you.
 
-Microsoft's [CDF guide](https://learn.microsoft.com/en-us/windows/uwp/security/companion-device-unlock) still describes post-unlock authentication as future work. That wording does not capture the broader behavior observed above. A [GoTrust ID field report](https://blog.csdn.net/weixin_46583461/article/details/125708231) independently describes application and Store purchase authentication, excluding UAC; it is corroboration about GoTrust, not a PocketLatch compatibility certification.
+## Will it work on my PC?
 
-Phone prompts distinguish Windows sign-in from general Windows Hello authentication when Windows supplies the scenario. Older clients and unknown scenarios receive generic authentication wording. CDF's [stage information](https://learn.microsoft.com/en-us/uwp/api/windows.security.authentication.identity.provider.secondaryauthenticationfactorauthenticationstageinfo) exposes the scenario but no requesting application name or purchase details. PocketLatch asks you to check the requesting app on the PC; it does not guess an app name from the foreground window.
+Maybe — and the app will tell you quickly. You'll need:
 
-## Similar projects
+**Windows**
+- A 64-bit or ARM64 PC with a Windows Hello PIN set up
+- Bluetooth LE that supports peripheral mode (some adapters and drivers don't)
+- Windows settings/policy that allow companion-device sign-in
+- Minimum: Windows 10 build 17763
 
-Comparison based on project documentation, not independent security audits:
+**Android**
+- Android 11 or newer, with a screen lock set
+- Bluetooth LE, plus Nearby devices and notification permissions
+- On Android 11, you'll also need to allow location permission for Bluetooth scanning
 
-| Project | Approach | Difference from PocketLatch |
-|---|---|---|
-| [PC Bio Unlock / PulseUnlock](https://github.com/MeisApps/pcbu-desktop) | Android approval over Bluetooth/network, multiple desktop platforms; PC password stored encrypted with its decryption key on the phone. | Broader desktop coverage. PocketLatch supports Android and iOS and authenticates through CDF without storing the Windows password. |
-| [WinUnlock](https://github.com/imabd645/WinUnlock) | Android over Bluetooth RFCOMM, custom Windows credential provider and service; documents DPAPI-protected password storage. | PocketLatch uses BLE and Windows' companion authentication provider rather than a custom password-submitting provider. |
-| [GoTrust ID](https://go-trust.com/gotrust-id/) | Current enterprise platform includes desktop login, SSO and MFA integrations. The older consumer app used CDF. | PocketLatch is a local MIT-licensed project without a service account. GoTrust's current enterprise coverage should not be attributed solely to CDF. |
+**iPhone**
+- iOS 16 or newer, with a passcode set
+- Bluetooth and notification permissions
+- Your own Apple signing setup in Xcode — the iOS download is an **unsigned** IPA, so it's not a tap-to-install or TestFlight build
 
-PocketLatch's distinguishing combination is local Bluetooth, Android and iOS source, no stored Windows password, and compatible Windows Hello app authentication. Its main constraints are deprecated CDF compatibility, limited hardware testing, and iOS signing requirements.
+Bluetooth was tested on real phones and a Windows VM during development, but this public build — and its new always-on Windows companion — still need testing on a wider range of hardware. Think of PocketLatch as an extra way in, not a replacement for your usual one.
 
-## Requirements
+Full step-by-step setup is in [INSTALL.md](INSTALL.md).
 
-| Platform | Requirements |
-|---|---|
-| Windows | x64 or ARM64 desktop, Windows Hello PIN, working CDF enrollment, policy allowing companion sign-in, BLE adapter/driver supporting peripheral mode. Minimum package OS: Windows 10 build 17763. |
-| Android | Android 11+, Bluetooth LE, screen lock, Nearby devices and notification permissions. Android 11 also needs location permission for scanning. |
-| iPhone | iOS 16+, Bluetooth, notifications, device passcode, and your own Apple signing setup. The IPA is **unsigned**, not a one-tap install or TestFlight build. |
+## Before you turn on automatic approval
 
-Bluetooth transport has been exercised on phones and a Windows VM during development. This cleaned public build and the new persistent Windows host still need broader device testing. It is not a replacement for your normal Windows sign-in method.
+Settings give you two switches: automatic approval, and requiring biometrics/device authentication.
 
-## Approval settings
+If you turn **automatic approval on and authentication off**, your PC can unlock whenever your phone is simply nearby and reachable — even if the phone itself is locked. That also applies to app and purchase prompts, not just sign-in, and PocketLatch can't tell them apart in that mode.
 
-By default, each request needs approval and device authentication. With **automatic approval on and biometrics off**, your paired PC can unlock whenever the phone is reachable, including while it is locked. This also applies to compatible app authentication and purchase prompts; automatic approval does not distinguish their purpose. With both on, open the notification and authenticate. Enrollment always requires device authentication.
+Some people will love that convenience. Just turn it on knowing exactly what it does. Leaving it off is the safer default.
 
-Keep the phone app in the background; do not force-stop it. Open it after a reboot. On iOS, unlock the phone once after restarting. Allow notifications in Focus/DND when using manual approval. Android battery management can interrupt the connection.
+A few habits help either way:
 
-## Build
+- Keep the phone app running in the background. Don't force-stop it, and open it once after a reboot. On iPhone, unlock your phone once after restarting it too.
+- Allow PocketLatch notifications through Focus / Do Not Disturb if you approve requests manually.
+- If Android's battery management keeps putting the app to sleep, exempt PocketLatch from it — otherwise the connection can drop.
 
-Windows builds run in [GitHub Actions](.github/workflows/package.yml) with Visual Studio UWP tools and Windows SDK 19041. Run `packaging/Build-Package.ps1` on a matching Windows build machine. The resulting installer bundles the Bluetooth host runtime.
+## How it compares
 
-Android: Java 17, Android SDK 35, then `cd Android && ./gradlew testDebugUnitTest lintRelease assembleRelease`. The local release APK is unsigned until signed with your own key. The release workflow uses repository signing secrets.
+There are other good projects in this space. The short version of how PocketLatch differs — based on each project's own documentation, not independent audits:
 
-iOS: open `iPhone/CdfCompanion.xcodeproj`, select your signing team, and run on your device. Protocol checks: `swift test --package-path iPhone`. The [iOS workflow](.github/workflows/ios.yml) builds an unsigned device IPA without a provisioning profile.
+- **[PC Bio Unlock / PulseUnlock](https://github.com/MeisApps/pcbu-desktop)** covers more desktop platforms and works over Bluetooth or network. It stores your PC password (encrypted, with the key on your phone). PocketLatch doesn't store your Windows password at all, and works with both Android and iOS.
+- **[WinUnlock](https://github.com/imabd645/WinUnlock)** is Android-only over Bluetooth, with its own custom Windows credential provider and DPAPI-protected password storage. PocketLatch uses BLE and Windows' built-in companion authentication instead of a custom password-submitting provider.
+- **[GoTrust ID](https://go-trust.com/gotrust-id/)** is an enterprise platform today — desktop login, SSO, and MFA, with an account behind it. The older consumer app used CDF, like PocketLatch does. PocketLatch is a small, local, MIT-licensed project with no service account.
 
-The Windows `CdfProbe` and iOS `CdfCompanion` source project names are internal implementation names. Installed apps are named PocketLatch.
+So PocketLatch's niche is pretty specific: local Bluetooth only, Android *and* iOS, no stored Windows password, and — where your PC supports it — Hello prompts beyond the lock screen. Its limits are just as specific: a deprecated Windows framework, limited hardware testing so far, and extra signing steps on iOS.
+
+## Building from source
+
+**Windows:** Builds run in [GitHub Actions](.github/workflows/package.yml). To build locally, you'll need a Windows machine with Visual Studio's UWP tools and Windows SDK 19041, then run `packaging/Build-Package.ps1`. The installer bundles the Bluetooth host runtime.
+
+**Android:** You'll need Java 17 and Android SDK 35.
+
+```sh
+cd Android && ./gradlew testDebugUnitTest lintRelease assembleRelease
+```
+
+A local build is unsigned until you sign it with your own key. The release workflow signs with the repository's signing secrets.
+
+**iOS:** Open `iPhone/CdfCompanion.xcodeproj` in Xcode, pick your own signing team, and run it on your device. To run the protocol checks: `swift test --package-path iPhone`. The [iOS workflow](.github/workflows/ios.yml) builds an unsigned IPA, with no provisioning profile.
+
+One bit of housekeeping if you're poking around the code: the Windows project is still called `CdfProbe` and the iOS project `CdfCompanion` internally. The installed app is PocketLatch on both.
 
 ## License
 
-MIT. Dependency notices are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+MIT. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for dependency notices.
